@@ -1,8 +1,10 @@
 <Project>
  <PropertyGroup>
     <Authors>PrinceManfred</Authors>
-    <Version>0.1.0.0</Version>
-    <Copyright>Copyright Travis Carter</Copyright>\
+    <Version>0.1.1.0</Version>
+    <Copyright>Copyright Travis Carter</Copyright>
+    <PackageProjectUrl>https://github.com/PrinceManfred/CastleOfOtranto.Strut</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PrinceManfred/CastleOfOtranto.Strut</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
  </PropertyGroup>
