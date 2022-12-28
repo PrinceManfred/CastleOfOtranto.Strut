@@ -4,11 +4,11 @@ using NJsonSchema.Generation;
 
 namespace CastleOfOtranto.Strut.NSwag;
 
-public class RequiredSchemaProcessor : ISchemaProcessor
+public class RequiredPropsSchemaProcessor : ISchemaProcessor
 {
     private readonly IPropertyHasDefaultMapper _propertyDefaultMapper;
 
-    public RequiredSchemaProcessor(IPropertyHasDefaultMapper propertyDefaultMapper)
+    public RequiredPropsSchemaProcessor(IPropertyHasDefaultMapper propertyDefaultMapper)
 	{
         _propertyDefaultMapper = propertyDefaultMapper;
 	}
@@ -24,8 +24,8 @@ public class RequiredSchemaProcessor : ISchemaProcessor
         // properties.
         if(instance is null) return;
 
-        Dictionary<string, bool>? propDefaultMap =
-            _propertyDefaultMapper.GetPropertyHasDefaultMap(instance, context.ContextualType, );
+        IDictionary<string, bool>? propDefaultMap =
+            _propertyDefaultMapper.GetPropertyHasDefaultMap(instance, context.ContextualType);
 
         if (propDefaultMap is null) return;
             

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace CastleOfOtranto.Strut.Mvc;
 
-public class MvcApiRequiredParameters : IApiDescriptionProvider
+public class RequiredParametersApiDescriptionProvider : IApiDescriptionProvider
 {
     public int Order { get; set; } = 1000;
 

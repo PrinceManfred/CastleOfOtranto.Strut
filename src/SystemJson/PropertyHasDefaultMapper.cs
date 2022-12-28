@@ -1,13 +1,15 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using CastleOfOtranto.Strut.Abstractions;
 
 namespace CastleOfOtranto.Strut.SystemJson
 {
-	public class PropertyHasDefaultMap : IPropertyHasDefaultMapper
+	public class PropertyHasDefaultMapper : IPropertyHasDefaultMapper
 	{
         private readonly JsonSerializerOptions? _options;
 
-        public PropertyHasDefaultMap(JsonSerializerOptions? options = null)
+        public PropertyHasDefaultMapper(JsonSerializerOptions? options = null)
         {
             _options = options;
         }
