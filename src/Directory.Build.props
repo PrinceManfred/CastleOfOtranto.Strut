@@ -1,0 +1,9 @@
+<Project>
+ <PropertyGroup>
+    <Authors>PrinceManfred</Authors>
+    <Version>0.1.0.0</Version>
+    <Copyright>Copyright Travis Carter</Copyright>\
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+ </PropertyGroup>
+</Project>
