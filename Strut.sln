@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CastleOfOtranto.Strut.NSwag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CastleOfOtranto.Strut.Swashbuckle", "src\Swashbuckle\CastleOfOtranto.Strut.Swashbuckle.csproj", "{A32EEB1A-08AB-4483-9BCF-6EB3786EA3F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CastleOfOtranto.Strut", "src\Strut\CastleOfOtranto.Strut.csproj", "{4EEE107F-3B70-467D-A18A-2887B5D87FD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A32EEB1A-08AB-4483-9BCF-6EB3786EA3F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A32EEB1A-08AB-4483-9BCF-6EB3786EA3F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A32EEB1A-08AB-4483-9BCF-6EB3786EA3F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EEE107F-3B70-467D-A18A-2887B5D87FD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EEE107F-3B70-467D-A18A-2887B5D87FD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EEE107F-3B70-467D-A18A-2887B5D87FD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EEE107F-3B70-467D-A18A-2887B5D87FD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
