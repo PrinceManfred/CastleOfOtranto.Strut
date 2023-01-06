@@ -11,6 +11,7 @@ public static class StrutSwaggerGenOptionsExtensions
         swaggerGenOptions.SupportNonNullableReferenceTypes();
         swaggerGenOptions.ParameterFilter<RequiredParameterFilter>();
         swaggerGenOptions.SchemaFilter<RequiredPropertySchemaFilter>();
+        swaggerGenOptions.RequestBodyFilter<RequiredRequestBodyFilter>();
         swaggerGenOptions.UseAllOfToExtendReferenceSchemas();
     }
 }
