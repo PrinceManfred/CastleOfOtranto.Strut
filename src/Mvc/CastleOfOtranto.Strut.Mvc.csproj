@@ -9,4 +9,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Strut\CastleOfOtranto.Strut.csproj" />
+  </ItemGroup>
 </Project>
