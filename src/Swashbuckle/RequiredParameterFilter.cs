@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -13,6 +14,10 @@ public class RequiredParameterFilter : IParameterFilter
     {
         if (parameter.Required) return;
         if (context.ParameterInfo.ParameterType.IsValueType) return;
+        if (context.ParameterInfo.HasDefaultValue) return;
+
+        // TODO: context.PropertyInfo might not be null here if binding complex types from query
+        // we need to process that if it's here.
 
         NullabilityInfo nullabilityInfo = _nullabilityInfoContext.Create(context.ParameterInfo);
         if(nullabilityInfo.WriteState == NullabilityState.NotNull)
