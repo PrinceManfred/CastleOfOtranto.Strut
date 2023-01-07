@@ -71,11 +71,11 @@ namespace CastleOfOtranto.Strut.Mvc
             TypeInfoCacheEntry entry;
             if(!_cache.TryGet(containingType, propertyInfo.Name, out entry))
             {
-                if (!propertyInfo.TryCreateTypeInfoCacheEntry(out entry)) return;
+                entry = propertyInfo.CreateTypeInfoCacheEntry();
                 _cache.TryAdd(containingType, propertyInfo.Name, entry);
             }
 
-            if (!entry.IsDefault) return;
+            if (entry.HasDefault) return;
             if (entry.NullabilityState == NullabilityState.NotNull)
             {
                 var requiredAttribute = propertyInfo.GetCustomAttribute<RequiredAttribute>();
