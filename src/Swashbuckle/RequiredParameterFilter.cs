@@ -13,6 +13,12 @@ public class RequiredParameterFilter : IParameterFilter
         if (parameter.Required) return;
         if (context.ParameterInfo.ParameterType.IsValueType) return;
         if (context.ParameterInfo.HasDefaultValue) return;
+        if (context.ParameterInfo.GetCustomAttributes()
+            .OfType<StrutIgnoreAttribute>()
+            .FirstOrDefault() is not null)
+        {
+            return;
+        }
 
         if(context.PropertyInfo is not null)
         {

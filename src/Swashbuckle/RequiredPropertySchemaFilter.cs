@@ -20,6 +20,13 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
     {
         if (context.MemberInfo is not null)
         {
+            if (context.MemberInfo.GetCustomAttributes()
+                .OfType<StrutIgnoreAttribute>()
+                .FirstOrDefault() is not null)
+            {
+                return;
+            }
+
             if (context.MemberInfo is PropertyInfo propertyInfo)
             {
                 ProcessProperty(propertyInfo, schema);
