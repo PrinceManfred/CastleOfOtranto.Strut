@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class StrutMvcServiceCollectionExtensions
 {
-	public static IServiceCollection AddStrutMvcRequiredParameters(this IServiceCollection services)
+	public static IServiceCollection AddStrutMvcApiDescriptionProvider(this IServiceCollection services)
 	{
 		services.TryAddEnumerable(
 			ServiceDescriptor.Transient<IApiDescriptionProvider
@@ -28,6 +28,7 @@ public static class StrutMvcServiceCollectionExtensions
 			options.ModelMetadataDetailsProviders.Add(new StrutValidationMetadataProvider(cache));
 			options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
 		});
+
 		return services;
 	}
 }
