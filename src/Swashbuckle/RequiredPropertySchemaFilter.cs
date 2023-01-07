@@ -9,10 +9,12 @@ namespace CastleOfOtranto.Strut.Swashbuckle;
 
 public class RequiredPropertySchemaFilter : ISchemaFilter
 {
-    private NullabilityInfoContext _nullabilityInfoContext = new();
+    private readonly TypeInfoCache _cache;
 
-    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, bool>>
-        _cache = new();
+    public RequiredPropertySchemaFilter(TypeInfoCache cache)
+    {
+        _cache = cache;
+    }
 
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
@@ -30,12 +32,12 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
 
         foreach(var prop in schema.Properties)
         {
-            if(prop.Value.Extensions.ContainsKey(IsDefaultValueExtension.EXTENSION_NAME))
+            if(prop.Value.Extensions.ContainsKey(HasDefaultValueExtension.EXTENSION_NAME))
             {
-                IOpenApiExtension isDefault = prop.Value.Extensions[IsDefaultValueExtension.EXTENSION_NAME];
-                prop.Value.Extensions.Remove(IsDefaultValueExtension.EXTENSION_NAME);
+                IOpenApiExtension hasDefault = prop.Value.Extensions[HasDefaultValueExtension.EXTENSION_NAME];
+                prop.Value.Extensions.Remove(HasDefaultValueExtension.EXTENSION_NAME);
 
-                if (!prop.Value.Nullable && isDefault == IsDefaultValueExtension.Yes)
+                if (!prop.Value.Nullable && hasDefault == HasDefaultValueExtension.No)
                 {
                     schema.Required.Add(prop.Key);
                 }
@@ -62,48 +64,34 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
     private void ProcessProperty(PropertyInfo propertyInfo, OpenApiSchema schema)
     {
         if (propertyInfo.PropertyType.IsValueType) return;
-        if (propertyInfo.ReflectedType is null) return;
 
-        ConcurrentDictionary<string, bool> defaultMap = GetDefaultMap(propertyInfo.ReflectedType);
-        if (defaultMap.TryGetValue(propertyInfo.Name, out bool isDefault))
+        var containerType = propertyInfo.GetContainerType();
+
+        if (containerType is null) return;
+
+        if (_cache.TryGet(containerType, propertyInfo.Name, out var entry))
         {
-            if (isDefault)
+            if (entry.HasDefault)
             {
-                schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.Yes);
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.Yes);
             }
             else
             {
-                schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.No);
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.No);
             }
         }
         else
         {
-            try
+            var newEntry = propertyInfo.CreateTypeInfoCacheEntry();
+            _cache.TryAdd(containerType, propertyInfo.Name, newEntry);
+
+            if (newEntry.HasDefault)
             {
-                var instance = CreateParameterlessInstance(propertyInfo.ReflectedType);
-                if (instance is null) return;
-
-                var getMethod = propertyInfo.GetGetMethod(true);
-
-                if (getMethod is null) return;
-
-                var value = getMethod.Invoke(instance, null);
-                var defaultValue = propertyInfo.PropertyType.GetDefaultValue();
-
-                if (value == defaultValue || (value is not null && value.Equals(defaultValue)))
-                {
-                    defaultMap.TryAdd(propertyInfo.Name, true);
-                    schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.Yes);
-                }
-                else
-                {
-                    defaultMap.TryAdd(propertyInfo.Name, false);
-                    schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.No);
-                }
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.Yes);
             }
-            catch
+            else
             {
-                return;
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.No);
             }
         }
     }
@@ -111,52 +99,35 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
     private void ProcessField(FieldInfo fieldInfo, OpenApiSchema schema)
     {
         if (fieldInfo.FieldType.IsValueType) return;
-        if (fieldInfo.ReflectedType is null) return;
 
-        ConcurrentDictionary<string, bool> defaultMap = GetDefaultMap(fieldInfo.ReflectedType);
-        if (defaultMap.TryGetValue(fieldInfo.Name, out bool isDefault))
+        var containerType = fieldInfo.GetContainerType();
+        if (containerType is null) return;
+
+        if (_cache.TryGet(containerType, fieldInfo.Name, out var entry))
         {
-            if (isDefault)
+            if (entry.HasDefault)
             {
-                schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.Yes);
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.Yes);
             }
             else
             {
-                schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.No);
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.No);
             }
-
         }
         else
         {
-            try
+            var newEntry = fieldInfo.CreateTypeInfoCacheEntry();
+            _cache.TryAdd(containerType, fieldInfo.Name, newEntry);
+
+            if (newEntry.HasDefault)
             {
-                var instance = CreateParameterlessInstance(fieldInfo.ReflectedType);
-                if (instance is null) return;
-
-                var value = fieldInfo.GetValue(instance);
-                var defaultValue = fieldInfo.FieldType.GetDefaultValue();
-
-                if (value == defaultValue || (value is not null && value.Equals(defaultValue)))
-                {
-                    defaultMap.TryAdd(fieldInfo.Name, true);
-                    schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.Yes);
-                }
-                else
-                {
-                    defaultMap.TryAdd(fieldInfo.Name, false);
-                    schema.Extensions.TryAdd(IsDefaultValueExtension.EXTENSION_NAME, IsDefaultValueExtension.No);
-                }
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.Yes);
             }
-            catch
+            else
             {
-                return;
+                schema.Extensions.TryAdd(HasDefaultValueExtension.EXTENSION_NAME, HasDefaultValueExtension.No);
             }
         }
-    }
-
-    private ConcurrentDictionary<string, bool> GetDefaultMap(Type type)
-    {
-        return _cache.GetOrAdd(type, new ConcurrentDictionary<string, bool>());
     }
 }
 
