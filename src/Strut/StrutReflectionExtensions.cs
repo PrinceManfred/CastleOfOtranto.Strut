@@ -48,7 +48,12 @@ public static class StrutReflectionExtensions
         try
         {
             var instance = CreateParameterlessInstance(containerType, nonPublicConstructor);
-            if (instance is null) return false;
+            if (instance is null)
+            {
+                var parameter = ExtractParameterFromCtor(containerType, propertyInfo.Name, nonPublicConstructor);
+                if (parameter is null) return false;
+                return parameter.HasDefaultValue;
+            }
 
             var getMethod = propertyInfo.GetGetMethod(nonPublicGetter);
             if (getMethod is null) return false;
@@ -140,6 +145,25 @@ public static class StrutReflectionExtensions
         catch
         {
             // Swallow errors.
+        }
+
+        return null;
+    }
+
+    private static ParameterInfo? ExtractParameterFromCtor(Type type, string name, bool nonPublic = false)
+    {
+        var bindingAttr = BindingFlags.Instance | BindingFlags.Public;
+        if (nonPublic) bindingAttr |= BindingFlags.NonPublic;
+
+        ConstructorInfo[] ctors = type.GetConstructors(bindingAttr);
+        foreach(ConstructorInfo ctor in ctors)
+        {
+            ParameterInfo[] parameters = ctor.GetParameters();
+
+            foreach(ParameterInfo parameter in parameters)
+            {
+                if (parameter.Name == name) return parameter;
+            }
         }
 
         return null;
