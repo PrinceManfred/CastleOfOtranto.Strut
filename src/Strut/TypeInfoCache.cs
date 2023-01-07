@@ -13,9 +13,9 @@ namespace CastleOfOtranto.Strut
             TypeInfoCacheEntry> _parameterCache = new();
 
         #region Member Methods
-        public bool Contains(Type containingType, string memberName)
+        public bool Contains(Type containerType, string memberName)
 		{
-            return Contains(new TypeInfoMemberCacheKey(containingType, memberName));
+            return Contains(new TypeInfoMemberCacheKey(containerType, memberName));
 		}
 
         public bool Contains(TypeInfoMemberCacheKey key)
@@ -23,9 +23,9 @@ namespace CastleOfOtranto.Strut
             return _memberCache.ContainsKey(key);
         }
 
-        public bool TryAdd(Type containingType, string memberName, TypeInfoCacheEntry entry)
+        public bool TryAdd(Type containerType, string memberName, TypeInfoCacheEntry entry)
         {
-            return TryAdd(new TypeInfoMemberCacheKey(containingType, memberName), entry);
+            return TryAdd(new TypeInfoMemberCacheKey(containerType, memberName), entry);
         }
 
         public bool TryAdd(TypeInfoMemberCacheKey key, TypeInfoCacheEntry entry)
@@ -33,9 +33,9 @@ namespace CastleOfOtranto.Strut
             return _memberCache.TryAdd(key, entry);
         }
 
-        public bool TryGet(Type containingType, string memberName, out TypeInfoCacheEntry entry)
+        public bool TryGet(Type containerType, string memberName, out TypeInfoCacheEntry entry)
         {
-            return TryGet(new TypeInfoMemberCacheKey(containingType, memberName), out entry);
+            return TryGet(new TypeInfoMemberCacheKey(containerType, memberName), out entry);
         }
 
         public bool TryGet(TypeInfoMemberCacheKey key, out TypeInfoCacheEntry entry)
@@ -45,9 +45,9 @@ namespace CastleOfOtranto.Strut
         #endregion
 
         #region Parameter Methods
-        public bool Contains(Type containingType, string methodName, string parameterName)
+        public bool Contains(Type containerType, string methodName, string parameterName)
         {
-            return Contains(new TypeInfoParameterCacheKey(containingType, methodName, parameterName));
+            return Contains(new TypeInfoParameterCacheKey(containerType, methodName, parameterName));
         }
 
         public bool Contains(TypeInfoParameterCacheKey key)
@@ -55,9 +55,9 @@ namespace CastleOfOtranto.Strut
             return _parameterCache.ContainsKey(key);
         }
 
-        public bool TryAdd(Type containingType, string methodName, string parameterName, TypeInfoCacheEntry entry)
+        public bool TryAdd(Type containerType, string methodName, string parameterName, TypeInfoCacheEntry entry)
         {
-            return TryAdd(new TypeInfoParameterCacheKey(containingType, methodName, parameterName), entry);
+            return TryAdd(new TypeInfoParameterCacheKey(containerType, methodName, parameterName), entry);
         }
 
         public bool TryAdd(TypeInfoParameterCacheKey key, TypeInfoCacheEntry entry)
@@ -65,9 +65,9 @@ namespace CastleOfOtranto.Strut
             return _parameterCache.TryAdd(key, entry);
         }
 
-        public bool TryGet(Type containingType, string methodName, string parameterName, out TypeInfoCacheEntry entry)
+        public bool TryGet(Type containerType, string methodName, string parameterName, out TypeInfoCacheEntry entry)
         {
-            return TryGet(new TypeInfoParameterCacheKey(containingType, methodName, parameterName), out entry);
+            return TryGet(new TypeInfoParameterCacheKey(containerType, methodName, parameterName), out entry);
         }
 
         public bool TryGet(TypeInfoParameterCacheKey key, out TypeInfoCacheEntry entry)
