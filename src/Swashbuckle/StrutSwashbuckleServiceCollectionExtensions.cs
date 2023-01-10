@@ -19,6 +19,7 @@ public static class StrutSwashbuckleServiceCollectionExtensions
             o.ParameterFilter<RequiredParameterFilter>();
             o.SchemaFilter<RequiredPropertySchemaFilter>(cache);
             o.RequestBodyFilter<RequiredRequestBodyFilter>();
+            o.OperationFilter<ReadOnlyOperationFilter>();
             o.UseAllOfToExtendReferenceSchemas();
         });
 
