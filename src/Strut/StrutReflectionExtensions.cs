@@ -138,9 +138,16 @@ public static class StrutReflectionExtensions
 
     private static object? CreateParameterlessInstance(Type type, bool nonPublic = false)
     {
+        var bindingAttr = BindingFlags.Instance | BindingFlags.Public;
+        if (nonPublic) bindingAttr |= BindingFlags.NonPublic;
+
         try
         {
-            return Activator.CreateInstance(type, nonPublic);
+            ConstructorInfo? ctor = type.GetConstructor(bindingAttr, Type.EmptyTypes);
+            if (ctor is not null)
+            {
+                return ctor.Invoke(default);
+            }
         }
         catch
         {
