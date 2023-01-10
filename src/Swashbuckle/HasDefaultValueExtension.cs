@@ -15,7 +15,7 @@ public class HasDefaultValueExtension : IOpenApiExtension
 
     private readonly string _hasDefault;
 
-    public const string EXTENSION_NAME = "x-castleofotranto-is-default";
+    public const string EXTENSION_NAME = "x-castleofotranto-has-default";
 
     private HasDefaultValueExtension(string hasDefault)
     {
