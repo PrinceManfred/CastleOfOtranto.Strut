@@ -1,98 +1,99 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace CastleOfOtranto.Strut.Mvc
+namespace CastleOfOtranto.Strut.Mvc;
+
+public class StrutValidationMetadataProvider : IValidationMetadataProvider
 {
-	public class StrutValidationMetadataProvider : IValidationMetadataProvider
+    private readonly TypeInfoCache _cache;
+    private static readonly NullabilityInfoContext _context = new();
+
+    public StrutValidationMetadataProvider(TypeInfoCache cache)
     {
-        private readonly TypeInfoCache _cache;
-        private static readonly NullabilityInfoContext _context = new();
+        _cache = cache;
+    }
 
-        public StrutValidationMetadataProvider(TypeInfoCache cache)
+    public void CreateValidationMetadata(ValidationMetadataProviderContext context)
+    {
+        if (context.Key.ParameterInfo is not null)
         {
-            _cache = cache;
+            ProcessParameter(context.ValidationMetadata, context.Key.ParameterInfo);
+            return;
         }
 
-        public void CreateValidationMetadata(ValidationMetadataProviderContext context)
+        if (context.Key.PropertyInfo is not null)
         {
-            if (context.Key.ParameterInfo is not null)
-            {
-                ProcessParameter(context.ValidationMetadata, context.Key.ParameterInfo);
-                return;
-            }
-
-            if(context.Key.PropertyInfo is not null)
-            {
-                ProcessProperty(context.ValidationMetadata, context.Key.PropertyInfo);
-                return;
-            }
-            
+            ProcessProperty(context.ValidationMetadata, context.Key.PropertyInfo);
+            return;
         }
 
-        private void ProcessParameter(ValidationMetadata validationMetadata, ParameterInfo parameterInfo)
+    }
+
+    private void ProcessParameter(ValidationMetadata validationMetadata, ParameterInfo parameterInfo)
+    {
+        if (parameterInfo.ParameterType.IsValueType) return;
+        if (parameterInfo.HasDefaultValue) return;
+
+        NullabilityInfo info = _context.Create(parameterInfo);
+        if (info.WriteState == NullabilityState.NotNull)
         {
-            if (parameterInfo.ParameterType.IsValueType) return;
-            if (parameterInfo.HasDefaultValue) return;
+            var requiredAttribute = parameterInfo.GetCustomAttribute<RequiredAttribute>();
 
-            NullabilityInfo info = _context.Create(parameterInfo);
-            if (info.WriteState == NullabilityState.NotNull)
+            if (requiredAttribute is not null) return;
+
+            requiredAttribute = new RequiredAttribute
             {
-                var requiredAttribute = parameterInfo.GetCustomAttribute<RequiredAttribute>();
+                AllowEmptyStrings = true
+            };
 
-                if (requiredAttribute is not null) return;
+            validationMetadata.IsRequired = true;
 
-                requiredAttribute = new RequiredAttribute
-                {
-                    AllowEmptyStrings = true
-                };
-
-                validationMetadata.IsRequired = true;
-
-                if (!validationMetadata.ValidatorMetadata.Contains(requiredAttribute))
-                {
-                    validationMetadata.ValidatorMetadata.Add(requiredAttribute);
-                }
+            if (!validationMetadata.ValidatorMetadata.Contains(requiredAttribute))
+            {
+                validationMetadata.ValidatorMetadata.Add(requiredAttribute);
             }
         }
+    }
 
-        private void ProcessProperty(ValidationMetadata validationMetadata, PropertyInfo propertyInfo)
+    private void ProcessProperty(ValidationMetadata validationMetadata, PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.PropertyType.IsValueType) return;
+
+        var containingType = propertyInfo.ReflectedType ?? propertyInfo.DeclaringType;
+        if (containingType is null) return;
+
+        TypeInfoCacheEntry entry;
+        if (!_cache.TryGet(containingType, propertyInfo.Name, out entry))
         {
-            if (propertyInfo.PropertyType.IsValueType) return;
+            entry = propertyInfo.CreateTypeInfoCacheEntry();
+            _cache.TryAdd(containingType, propertyInfo.Name, entry);
+        }
 
-            var containingType = propertyInfo.ReflectedType ?? propertyInfo.DeclaringType;
-            if (containingType is null) return;
+        if (entry.HasDefault) return;
+        if (entry.NullabilityState == NullabilityState.NotNull)
+        {
+            var requiredAttribute = propertyInfo.GetCustomAttribute<RequiredAttribute>();
 
-            TypeInfoCacheEntry entry;
-            if(!_cache.TryGet(containingType, propertyInfo.Name, out entry))
+            if (requiredAttribute is not null) return;
+
+            requiredAttribute = new RequiredAttribute
             {
-                entry = propertyInfo.CreateTypeInfoCacheEntry();
-                _cache.TryAdd(containingType, propertyInfo.Name, entry);
-            }
+                AllowEmptyStrings = true
+            };
 
-            if (entry.HasDefault) return;
-            if (entry.NullabilityState == NullabilityState.NotNull)
+            validationMetadata.IsRequired = true;
+
+            if (!validationMetadata.ValidatorMetadata.Contains(requiredAttribute))
             {
-                var requiredAttribute = propertyInfo.GetCustomAttribute<RequiredAttribute>();
-
-                if (requiredAttribute is not null) return;
-
-                requiredAttribute = new RequiredAttribute
-                {
-                    AllowEmptyStrings = true
-                };
-
-                validationMetadata.IsRequired = true;
-
-                if (!validationMetadata.ValidatorMetadata.Contains(requiredAttribute))
-                {
-                    validationMetadata.ValidatorMetadata.Add(requiredAttribute);
-                }
+                validationMetadata.ValidatorMetadata.Add(requiredAttribute);
             }
         }
     }

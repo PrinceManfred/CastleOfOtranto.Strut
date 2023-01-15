@@ -7,13 +7,13 @@ namespace CastleOfOtranto.Strut.SystemJson;
 
 public static class PropertyHasDefaultMapperFactory
 {
-	public static JsonSerializerOptions? GetMvcJsonSerializerOptions(
-		this IServiceProvider serviceProvider)
-	{
+    public static JsonSerializerOptions? GetMvcJsonSerializerOptions(
+        this IServiceProvider serviceProvider)
+    {
         using IServiceScope serviceScope = serviceProvider.CreateScope();
         var jsonOptions = serviceScope.ServiceProvider.GetService<IOptions<Microsoft.AspNetCore.Mvc.JsonOptions>>();
 
-		return jsonOptions?.Value.JsonSerializerOptions;
+        return jsonOptions?.Value.JsonSerializerOptions;
     }
 
     public static JsonSerializerOptions? GetHttpJsonSerializerOptions(

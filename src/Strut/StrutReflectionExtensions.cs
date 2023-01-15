@@ -77,7 +77,7 @@ public static class StrutReflectionExtensions
     {
         TypeInfoCacheEntry entry = new(propertyInfo.HasDefault(nonPublicGetter, nonPublicConstructor),
             propertyInfo.GetNullabilityState());
-           
+
         return entry;
     }
 
@@ -163,11 +163,11 @@ public static class StrutReflectionExtensions
         if (nonPublic) bindingAttr |= BindingFlags.NonPublic;
 
         ConstructorInfo[] ctors = type.GetConstructors(bindingAttr);
-        foreach(ConstructorInfo ctor in ctors)
+        foreach (ConstructorInfo ctor in ctors)
         {
             ParameterInfo[] parameters = ctor.GetParameters();
 
-            foreach(ParameterInfo parameter in parameters)
+            foreach (ParameterInfo parameter in parameters)
             {
                 if (parameter.Name == name) return parameter;
             }

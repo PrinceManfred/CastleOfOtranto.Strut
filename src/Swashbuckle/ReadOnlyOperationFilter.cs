@@ -2,30 +2,29 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace CastleOfOtranto.Strut.Swashbuckle
+namespace CastleOfOtranto.Strut.Swashbuckle;
+
+public class ReadOnlyOperationFilter : IOperationFilter
 {
-	public class ReadOnlyOperationFilter : IOperationFilter
-	{
-		public ReadOnlyOperationFilter()
-		{
-		}
+    public ReadOnlyOperationFilter()
+    {
+    }
 
-        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    {
+        operation.Parameters = operation.Parameters.Where(p =>
         {
-            operation.Parameters = operation.Parameters.Where(p =>
+            if (p.Extensions.TryGetValue(IsReadOnlyExtension.EXTENSION_NAME, out var isReadOnly))
             {
-                if(p.Extensions.TryGetValue(IsReadOnlyExtension.EXTENSION_NAME, out var isReadOnly))
-                {
-                    p.Extensions.Remove(IsReadOnlyExtension.EXTENSION_NAME);
-                    if(isReadOnly == IsReadOnlyExtension.Yes) return false;
-                }
+                p.Extensions.Remove(IsReadOnlyExtension.EXTENSION_NAME);
+                if (isReadOnly == IsReadOnlyExtension.Yes) return false;
+            }
 
-                return true;
-            })
-            .ToList();
-            
+            return true;
+        })
+        .ToList();
 
-        }
+
     }
 }
 

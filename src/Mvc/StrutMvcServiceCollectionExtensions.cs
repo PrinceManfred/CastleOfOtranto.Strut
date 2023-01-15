@@ -10,26 +10,26 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class StrutMvcServiceCollectionExtensions
 {
-	public static IServiceCollection AddStrutMvcApiDescriptionProvider(this IServiceCollection services)
-	{
-		services.TryAddEnumerable(
-			ServiceDescriptor.Transient<IApiDescriptionProvider
-				,RequiredParametersApiDescriptionProvider>());
+    public static IServiceCollection AddStrutMvcApiDescriptionProvider(this IServiceCollection services)
+    {
+        services.TryAddEnumerable(
+            ServiceDescriptor.Transient<IApiDescriptionProvider
+                , RequiredParametersApiDescriptionProvider>());
 
-		return services;
-	}
+        return services;
+    }
 
-	public static IServiceCollection AddStrutMvc(this IServiceCollection services)
-	{
-		services.TryAddSingleton<TypeInfoCache>();
+    public static IServiceCollection AddStrutMvc(this IServiceCollection services)
+    {
+        services.TryAddSingleton<TypeInfoCache>();
 
-		services.AddOptions<MvcOptions>().Configure<TypeInfoCache>((options, cache) =>
-		{
-			options.ModelMetadataDetailsProviders.Add(new StrutValidationMetadataProvider(cache));
-			options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-		});
+        services.AddOptions<MvcOptions>().Configure<TypeInfoCache>((options, cache) =>
+        {
+            options.ModelMetadataDetailsProviders.Add(new StrutValidationMetadataProvider(cache));
+            options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+        });
 
-		return services;
-	}
+        return services;
+    }
 }
 

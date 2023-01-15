@@ -31,15 +31,15 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
             {
                 ProcessProperty(propertyInfo, schema);
             }
-            else if(context.MemberInfo is FieldInfo fieldInfo)
+            else if (context.MemberInfo is FieldInfo fieldInfo)
             {
                 ProcessField(fieldInfo, schema);
             }
         }
 
-        foreach(var prop in schema.Properties)
+        foreach (var prop in schema.Properties)
         {
-            if(prop.Value.Extensions.ContainsKey(HasDefaultValueExtension.EXTENSION_NAME))
+            if (prop.Value.Extensions.ContainsKey(HasDefaultValueExtension.EXTENSION_NAME))
             {
                 IOpenApiExtension hasDefault = prop.Value.Extensions[HasDefaultValueExtension.EXTENSION_NAME];
                 prop.Value.Extensions.Remove(HasDefaultValueExtension.EXTENSION_NAME);

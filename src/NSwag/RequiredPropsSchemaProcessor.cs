@@ -9,30 +9,31 @@ public class RequiredPropsSchemaProcessor : ISchemaProcessor
     private readonly IPropertyHasDefaultMapper _propertyDefaultMapper;
 
     public RequiredPropsSchemaProcessor(IPropertyHasDefaultMapper propertyDefaultMapper)
-	{
+    {
         _propertyDefaultMapper = propertyDefaultMapper;
-	}
+    }
 
     public void Process(SchemaProcessorContext context)
     {
         if (context.Schema.Properties.Count == 0) return;
 
         object? instance = CreateParameterlessInstance(context.ContextualType);
-            
+
         // We can't make an informed decision without an instance.
         // User needs to provide some other means of annotating required
         // properties.
-        if(instance is null) return;
+        if (instance is null) return;
 
         IDictionary<string, bool>? propDefaultMap =
             _propertyDefaultMapper.GetPropertyHasDefaultMap(instance, context.ContextualType);
 
         if (propDefaultMap is null) return;
-            
+
         foreach (var schemaProp in context.Schema.Properties)
         {
             // Bail out is someone else determined this is required.
-            if (context.Schema.RequiredProperties.Contains(schemaProp.Key)) {
+            if (context.Schema.RequiredProperties.Contains(schemaProp.Key))
+            {
                 continue;
             }
 
