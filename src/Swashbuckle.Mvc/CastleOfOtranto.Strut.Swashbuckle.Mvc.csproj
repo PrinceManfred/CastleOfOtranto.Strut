@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Mvc\CastleOfOtranto.Strut.Mvc.csproj" />
     <ProjectReference Include="..\Swashbuckle\CastleOfOtranto.Strut.Swashbuckle.csproj" />
+    <ProjectReference Include="..\Strut\CastleOfOtranto.Strut.csproj" />
   </ItemGroup>
 </Project>
