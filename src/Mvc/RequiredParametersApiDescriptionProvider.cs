@@ -43,26 +43,22 @@ public class RequiredParametersApiDescriptionProvider : IApiDescriptionProvider
 
             List<ApiParameterDescription> processedParameters = new();
 
-            foreach (var param in result.ParameterDescriptions)
+            foreach (ApiParameterDescription param in result.ParameterDescriptions)
             {
-
-                // TODO: Check parameter for StrutPArameterProviderAttribute first
                 if (TryProcessParameterLevelParameterProvider(processedParameters, param))
                 {
                     continue;
                 }
 
-                if (param.ParameterDescriptor?.BindingInfo?.BinderType is not null)
+                if (TryProcessTopLevelModelBinder(processedParameters, param))
                 {
-                    ProcessTopLevelModelBinder(processedParameters, param);
                     continue;
                 }
 
                 if (param.ParameterDescriptor?.ParameterType != param.ModelMetadata.ModelType)
                 {
-                    if (param.BindingInfo?.BinderType is not null)
+                    if (TryProcessNestedModelBinder(processedParameters, param))
                     {
-                        ProcessNestedModelBinder(processedParameters, param);
                         continue;
                     }
 
@@ -102,44 +98,51 @@ public class RequiredParametersApiDescriptionProvider : IApiDescriptionProvider
         if (strutParameterProviderAttribute is null) return false;
 
         AddCustomParameters(parameters, strutParameterProviderAttribute.ParameterProviderType, description, parameterDescriptor);
+        _processed.Add(parameterDescriptor.Name);
 
         return true;
     }
 
-    private void ProcessTopLevelModelBinder(List<ApiParameterDescription> parameters, ApiParameterDescription description)
+    private bool TryProcessTopLevelModelBinder(List<ApiParameterDescription> parameters, ApiParameterDescription description)
     {
         var parameterDescriptor = description.ParameterDescriptor;
+        if (parameterDescriptor?.BindingInfo?.BinderType is null) return false;
 
-        if (_processed.Contains(parameterDescriptor.Name)) return;
+        if (_processed.Contains(parameterDescriptor.Name)) return true;
 
-        var binderType = parameterDescriptor.BindingInfo?.BinderType;
-        if (binderType is null) return;
+        var binderType = parameterDescriptor.BindingInfo.BinderType;
 
         var attr = binderType.GetCustomAttributes(true)
             .OfType<StrutParameterProviderAttribute>()
             .FirstOrDefault();
 
         // TODO: Also check if the model binder implements IParameterProvider
-        if (attr is null) return;
+        if (attr is null) return false;
 
         AddCustomParameters(parameters, attr.ParameterProviderType, description, parameterDescriptor);
+        _processed.Add(parameterDescriptor.Name);
+
+        return true;
     }
 
-    private void ProcessNestedModelBinder(List<ApiParameterDescription> parameters, ApiParameterDescription description)
+    private bool TryProcessNestedModelBinder(List<ApiParameterDescription> parameters, ApiParameterDescription description)
     {
         var parameterDescriptor = description.ParameterDescriptor;
+        if (parameterDescriptor is null) return false;
 
         var binderType = description.BindingInfo?.BinderType;
-        if (binderType is null) return;
+        if (binderType is null) return false;
 
         var attr = binderType.GetCustomAttributes(true)
             .OfType<StrutParameterProviderAttribute>()
             .FirstOrDefault();
 
         // TODO: Also check if the model binder implements IParameterProvider
-        if (attr is null) return;
+        if (attr is null) return false;
 
-        AddCustomParameters(parameters, attr.ParameterProviderType, description, parameterDescriptor);        
+        AddCustomParameters(parameters, attr.ParameterProviderType, description, parameterDescriptor);
+
+        return true;
     }
 
     private void AddCustomParameters(List<ApiParameterDescription> parameters,
