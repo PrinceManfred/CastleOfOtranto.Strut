@@ -19,18 +19,13 @@ public class RequiredParameterFilter : IParameterFilter
             return;
         }
 
-        if (context.PropertyInfo is not null)
-        {
-            parameter.Name = $"{context.ParameterInfo.Name}.{parameter.Name}";
-        }
-
         if (parameter.Required) return;
         if (context.ParameterInfo.ParameterType.IsValueType) return;
         if (context.ParameterInfo.HasDefaultValue) return;
-        
+
         if (context.PropertyInfo is not null)
         {
-            if(context.PropertyInfo.SetMethod is null)
+            if (context.PropertyInfo.SetMethod is null)
             {
                 parameter.Extensions.Add(IsReadOnlyExtension.EXTENSION_NAME, IsReadOnlyExtension.Yes);
                 return;
@@ -49,12 +44,18 @@ public class RequiredParameterFilter : IParameterFilter
             if (context.PropertyInfo.GetNullabilityState() == NullabilityState.NotNull)
             {
                 parameter.Required = true;
-                
+
             }
             return;
         }
 
-        if(context.ParameterInfo.GetNullabilityState() == NullabilityState.NotNull)
+        if (context.ApiParameterDescription is StrutApiParameterDescription strutDescription)
+        {
+            parameter.Required = strutDescription.StrutIsRequired;
+            return;
+        }
+
+        if (context.ParameterInfo.GetNullabilityState() == NullabilityState.NotNull)
         {
             parameter.Required = true;
         }
